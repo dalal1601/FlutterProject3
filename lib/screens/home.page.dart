@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,6 +11,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
+    User? user = FirebaseAuth.instance.currentUser;
+    String userEmail = user?.email ?? 'No email available';
     return Scaffold(
       appBar: AppBar(title: Text('Home',style: TextStyle(color: Colors.white, fontSize: 40),
       ),
@@ -34,9 +36,9 @@ class _HomePageState extends State<HomePage> {
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
                     Text(
-                      "dalal@gmail.com",
-                      style: TextStyle(color: Colors.white, fontSize: 10),
-                    )
+                    userEmail, // Displaying the logged-in user's email
+                    style: TextStyle(color: Colors.white, fontSize: 10),
+                  ),
                 ],
               ),
               ),
