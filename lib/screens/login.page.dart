@@ -8,13 +8,14 @@ class LoginPage extends StatefulWidget {
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
-
+//gèrent les champs de texte pour l'email et le mot de passe.
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _passwordVisible = false;
 
   // SignIn Method
+  //usercredentialcontient les informations sur l'utilisateur qui a réussi à se connecter ou à s'inscrire
   Future<void> signIn() async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(

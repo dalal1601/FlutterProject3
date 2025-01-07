@@ -1,13 +1,13 @@
-import 'dart:typed_data';
+import 'dart:typed_data'; //  Uint8List  manipuler des données binaires, comme les images sous forme de tableaux d'octets
 import 'dart:convert'; // Import for base64 encoding
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; //Fournit les widgets et outils pour créer une interface Flutter.
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
-
+//statful cuz we have interactions like to select img ...
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+  const RegisterPage({super.key}); //constr const
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -18,13 +18,13 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _fullNameController = TextEditingController(); // text..controller control and monitor the text in a TextField or TextFormField
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Uint8List? _imageBytes;
   String? _imageName;
   bool _passwordVisible = false;
-
+//Un Future représente une valeur ou une erreur qui sera disponible à un moment donné dans le futur
   Future<void> _pickImage() async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -48,7 +48,7 @@ class _RegisterPageState extends State<RegisterPage> {
       );
 
       if (userCredential.user != null) {
-        // Convert image to base64 string
+        // L'image est convertie en chaîne base64 avec base64Encode.
         String base64Image = base64Encode(_imageBytes!);
 
         // Save additional data (fullName, email, and base64 image) to Firestore
@@ -67,7 +67,7 @@ class _RegisterPageState extends State<RegisterPage> {
       Fluttertoast.showToast(msg: message); // Show the error message using Toast
     }
   }
-
+//responsable de l'affichage de l'interface utilisateur
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -149,6 +149,16 @@ class _RegisterPageState extends State<RegisterPage> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     prefixIcon: Icon(Icons.lock),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _passwordVisible = !_passwordVisible;
+                        });
+                      },
+                      icon: Icon(
+                        _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                      ),
+                    ),
                   ),
                   validator: (value) =>
                       value != _passwordController.text ? "Passwords do not match" : null,

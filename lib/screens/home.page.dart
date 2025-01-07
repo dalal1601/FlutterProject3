@@ -109,9 +109,72 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: Center(
-        child: Text(
-          "Welcome to the home page",
-          style: TextStyle(color: Colors.blueGrey, fontSize: 30),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // A clean, floating card with a welcome message and user info
+              Card(
+                elevation: 10,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                color: Colors.white.withOpacity(0.8),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      // Profile image and username
+                      imageBase64 == null
+                          ? CircleAvatar(
+                              backgroundImage: AssetImage("images/amongus.jpg"), // Default image if none exists
+                              radius: 50,
+                            )
+                          : CircleAvatar(
+                              backgroundImage: MemoryImage(base64Decode(imageBase64!)),
+                              radius: 50,
+                            ),
+                      SizedBox(height: 20),
+                      Text(
+                        "Welcome, ${fullName ?? 'Loading...'}",
+                        style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        "Email: ${userEmail ?? 'Loading...'}",
+                        style: TextStyle(fontSize: 18, color: Colors.blueGrey),
+                      ),
+                      SizedBox(height: 30),
+                      // Interactive buttons
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/covidTracker');
+                        },
+                        child: Text("Track Your Covid Status"),
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                          backgroundColor: Colors.blueAccent,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/chatbot');
+                        },
+                        child: Text("Start Chatbot"),
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                          backgroundColor: Colors.greenAccent,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
