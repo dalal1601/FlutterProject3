@@ -2,6 +2,8 @@ import 'dart:convert'; // For base64 decoding
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart'; // For picking image from gallery
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,6 +16,7 @@ class _HomePageState extends State<HomePage> {
   String? fullName;
   String? userEmail;
   String? imageBase64;
+  late XFile _imageFile;
 
   @override
   void initState() {
@@ -31,6 +34,71 @@ class _HomePageState extends State<HomePage> {
         userEmail = snapshot['email'];
         imageBase64 = snapshot['imageBase64'];
       });
+    }
+  }
+
+  void _showChangeNameDialog(BuildContext context) {
+    TextEditingController newNameController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Change Full Name'),
+          content: TextField(
+            controller: newNameController,
+            decoration: InputDecoration(hintText: 'Enter new full name'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                String newFullName = newNameController.text;
+                if (newFullName.isNotEmpty) {
+                  User? user = FirebaseAuth.instance.currentUser;
+                  if (user != null) {
+                    await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+                      'fullName': newFullName,
+                    });
+                    Navigator.pop(context);
+                    Fluttertoast.showToast(msg: 'Full name updated successfully');
+                    _loadUserData(); 
+                  }
+                } else {
+                  Fluttertoast.showToast(msg: 'Please enter a valid full name');
+                }
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _updateProfilePicture() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedImage = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedImage != null) {
+      setState(() {
+        _imageFile = pickedImage;
+      });
+
+      List<int> imageBytes = await pickedImage.readAsBytes();
+      String base64Image = base64Encode(imageBytes);
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+          'imageBase64': base64Image,
+        });
+        Fluttertoast.showToast(msg: 'Profile picture updated successfully');
+        _loadUserData(); 
+      }
     }
   }
 
@@ -93,7 +161,7 @@ class _HomePageState extends State<HomePage> {
               trailing: Icon(Icons.arrow_forward),
               title: Text('Settings'),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pushNamed(context, '/settings');
               },
             ),
             Divider(color: Colors.blue),
@@ -167,6 +235,28 @@ class _HomePageState extends State<HomePage> {
                           padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                           backgroundColor: Colors.greenAccent,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          _showChangeNameDialog(context); // Show dialog to change name
+                        },
+                        child: Text("Change Full Name"),
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                          backgroundColor: Colors.orangeAccent,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: _updateProfilePicture, // Update profile picture
+                        child: Text("Update Profile Picture"),
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                          backgroundColor: Colors.purpleAccent,
                         ),
                       ),
                     ],
